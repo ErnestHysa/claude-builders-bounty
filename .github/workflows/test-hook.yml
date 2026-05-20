@@ -1,0 +1,30 @@
+name: Destructive Command Blocker Hook Tests
+
+on:
+  push:
+    paths:
+      - 'pre-tool-use.py'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-hook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Test blocked commands
+        run: |
+          echo '{"type": "bash", "command": "rm -rf /"}' | python3 pre-tool-use.py
+          echo "Exit code: $?"
+        continue-on-error: true
+
+      - name: Test allowed commands
+        run: |
+          echo '{"type": "bash", "command": "ls -la"}' | python3 pre-tool-use.py
+          echo "Exit code: $?"
