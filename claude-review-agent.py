@@ -234,19 +234,19 @@ def analyze_with_zai_api(pr: PRInfo) -> str:
 def generate_review(pr: PRInfo) -> str:
     """Generate review using available method."""
 
-    # Try Anthropic API first
-    if HAS_ANTHROPIC:
-        try:
-            return analyze_with_anthropic(pr)
-        except Exception as e:
-            print(f"Anthropic API: {e}", file=sys.stderr)
-
-    # Try ZAI API
+    # Try ZAI API first (most likely to be configured)
     if os.environ.get('ZAI_API_KEY'):
         try:
             return analyze_with_zai_api(pr)
         except Exception as e:
             print(f"ZAI API: {e}", file=sys.stderr)
+
+    # Try Anthropic API second
+    if HAS_ANTHROPIC:
+        try:
+            return analyze_with_anthropic(pr)
+        except Exception as e:
+            print(f"Anthropic API: {e}", file=sys.stderr)
 
     # Try claude CLI
     try:
